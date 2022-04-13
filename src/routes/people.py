@@ -65,13 +65,39 @@ def createPerson(person: QueryPerson, response: Response) -> Person:
             person.citizen_id,
         )
         response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
-        return result.lastrowid
+        return dict(result.lastrowid)
 
 
 @router.put("/{personId}")
-def updatePerson(personId: int):
-    # TODO: update person in database
-    return {"internalCode": InternalCode.IC_FOR_FUTURE_IMPLEMENTATION}
+def updatePerson(personId: int, person: QueryPerson, response: Response) -> Person:
+    """
+    Update a person
+    TODO: make all fields in QueryPerson optional
+    """
+
+    with engine.connect() as conn:
+        result = conn.execute(
+            """
+            UPDATE people
+            SET prefix_th = ?, first_name_th = ?, middle_name_th = ?, last_name_th = ?, prefix_en = ?, first_name_en = ?, middle_name_en = ?, last_name_en = ?, birthdate = ?, citizen_id = ?
+            WHERE id = ?
+            """,
+            person.prefix_th.value,
+            person.first_name_th,
+            person.middle_name_th,
+            person.last_name_th,
+            person.prefix_en.value,
+            person.first_name_en,
+            person.middle_name_en,
+            person.last_name_en,
+            person.birthdate,
+            person.citizen_id,
+            personId,
+        )
+        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+        return dict(result.lastrowid)
+
+    # return {"internalCode": InternalCode.IC_FOR_FUTURE_IMPLEMENTATION}
 
 
 @router.delete("/{personId}")
