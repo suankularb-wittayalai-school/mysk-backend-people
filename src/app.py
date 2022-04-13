@@ -7,9 +7,13 @@ import os
 
 from mysk_utils.response import InternalCode
 
+from routes import people
+
 load_dotenv()
 
 app = FastAPI()
+
+app.include_router(people.router, prefix="/people", tags=["people"])
 
 
 @app.get("/")
