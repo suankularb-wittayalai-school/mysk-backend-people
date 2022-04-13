@@ -42,15 +42,15 @@ contact = Table(
 )
 
 person_contact_types = Table(
-    "person_contact_types",
+    "people_contact_types",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("person_id", Integer, ForeignKey("person.id")),
+    Column("person_id", Integer, ForeignKey("people.id")),
     Column("contact_type_id", Integer, ForeignKey("contact.id")),
 )
 
-person = Table(
-    "person",
+people = Table(
+    "people",
     metadata,
     Column("id", Integer, primary_key=True),
     Column("prefix_th", String),
@@ -69,7 +69,7 @@ student = Table(
     "student",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("person_id", Integer, ForeignKey("person.id")),
+    Column("person_id", Integer, ForeignKey("people.id")),
     Column("student_id", String),
 )
 
@@ -77,7 +77,7 @@ teacher = Table(
     "teacher",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("person_id", Integer, ForeignKey("person.id")),
+    Column("person_id", Integer, ForeignKey("people.id")),
     Column("teacher_id", String),
 )
 
