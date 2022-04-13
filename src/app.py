@@ -22,4 +22,10 @@ def healthCheck():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=os.environ.get("HOST"), port=int(os.environ.get("PORT")))
+    uvicorn.run(
+        "app:app",
+        host=os.environ.get("HOST"),
+        port=int(os.environ.get("PORT")),
+        log_level="info",
+        reload=True,
+    )

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from mysk_utils.response import InternalCode
+from mysk_utils.schema import QueryPerson
 
 
 router = APIRouter()
@@ -19,7 +20,7 @@ def getPerson(personId: int):
 
 
 @router.post("/", status_code=201)
-def createPerson():
+def createPerson(person: QueryPerson):
     # TODO: create person in database
     return {"internalCode": InternalCode.IC_FOR_FUTURE_IMPLEMENTATION}
 
