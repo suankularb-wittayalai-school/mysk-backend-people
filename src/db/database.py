@@ -6,7 +6,7 @@ from sqlalchemy import (
     String,
     MetaData,
     ForeignKey,
-    DateTime,
+    Date,
     # Boolean,
     # Constraint,
 )
@@ -25,14 +25,14 @@ engine = create_engine(
     os.environ.get("DATABASE_URL"), connect_args={"check_same_thread": False}
 )
 
-contact_type = Table(
+contact_type_table = Table(
     "contact_type",
     metadata,
     Column("id", Integer, primary_key=True),
     Column("name", String(50), nullable=False),
 )
 
-contact = Table(
+contact_table = Table(
     "contact",
     metadata,
     Column("id", Integer, primary_key=True),
@@ -41,7 +41,7 @@ contact = Table(
     Column("value", String(50), nullable=False),
 )
 
-person_contact_types = Table(
+person_contact_types_table = Table(
     "people_contact_types",
     metadata,
     Column("id", Integer, primary_key=True),
@@ -49,7 +49,7 @@ person_contact_types = Table(
     Column("contact_type_id", Integer, ForeignKey("contact.id")),
 )
 
-people = Table(
+people_table = Table(
     "people",
     metadata,
     Column("id", Integer, primary_key=True),
@@ -61,11 +61,11 @@ people = Table(
     Column("first_name_en", String),
     Column("middle_name_en", String, nullable=True),
     Column("last_name_en", String),
-    Column("birthdate", DateTime),
+    Column("birthdate", Date),
     Column("citizen_id", String),
 )
 
-student = Table(
+student_table = Table(
     "student",
     metadata,
     Column("id", Integer, primary_key=True),
@@ -73,7 +73,7 @@ student = Table(
     Column("student_id", String),
 )
 
-teacher = Table(
+teacher_table = Table(
     "teacher",
     metadata,
     Column("id", Integer, primary_key=True),
@@ -91,7 +91,7 @@ contact_types = engine.execute("SELECT * FROM contact_type").fetchall()
 if contact_types == []:
     # add contact types
     engine.execute(
-        contact_type.insert(),
+        contact_type_table.insert(),
         [
             {"name": "Phone"},
             {"name": "Email"},
