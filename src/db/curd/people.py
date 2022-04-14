@@ -136,3 +136,35 @@ def create_person(person: QueryPerson) -> int:
     conn.close()
     created_person = get_person(person_id)
     return created_person
+
+
+def update_person(person_id: int, person: QueryPerson) -> Person:
+    """
+    Update a person in the database.
+    """
+    conn = engine.connect()
+
+    updating = get_person(person_id)
+
+    if updating is None:
+        raise Exception(f"Person with id {person_id} not found")
+
+    conn.execute(
+        people_table.update()
+        .where(people_table.c.id == person_id)
+        .values(
+            prefix_th=person.prefix_th.value,
+            first_name_th=person.first_name_th,
+            middle_name_th=person.middle_name_th,
+            last_name_th=person.last_name_th,
+            prefix_en=person.prefix_en.value,
+            first_name_en=person.first_name_en,
+            middle_name_en=person.middle_name_en,
+            last_name_en=person.last_name_en,
+            birthdate=person.birthdate,
+            citizen_id=person.citizen_id,
+        ),
+    )
+    conn.close()
+    updated_person = get_person(person_id)
+    return updated_person
