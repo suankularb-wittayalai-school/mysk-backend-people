@@ -4,8 +4,6 @@ from typing import List
 from ..database import (
     engine,
     people_table,
-    contact_table,
-    contact_type_table,
     person_contact_table,
 )
 from mysk_utils.schema import Person, Contact, QueryPerson

@@ -9,6 +9,7 @@ from sqlalchemy import (
     Date,
     # Boolean,
     # Constraint,
+    ForeignKeyConstraint,
 )
 from dotenv import load_dotenv
 import os
@@ -38,14 +39,17 @@ contact_table = Table(
     Column("name", String(50), nullable=False),
     Column("type", Integer, ForeignKey("contact_type.id"), nullable=False),
     Column("value", String(50), nullable=False),
+    ForeignKeyConstraint(
+        ["type"], ["contact_type.id"], name="contact_type_fk", ondelete="CASCADE"
+    ),
 )
 
 person_contact_table = Table(
     "people_contact",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("person_id", Integer, ForeignKey("people.id")),
-    Column("contact_id", Integer, ForeignKey("contact.id")),
+    Column("person_id", Integer, ForeignKey("people.id", ondelete="CASCADE")),
+    Column("contact_id", Integer, ForeignKey("contact.id", ondelete="CASCADE")),
 )
 
 people_table = Table(

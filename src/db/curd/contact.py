@@ -19,6 +19,9 @@ def get_contact_by_id(contact_id: int) -> Contact:
     ).fetchone()
     conn.close()
 
+    if contact is None:
+        return
+
     return Contact(
         id=contact.id, type=contact["name_1"], value=contact.value, name=contact.name
     )
@@ -80,3 +83,18 @@ def update_contact(contact_id: int, contact: QueryContact) -> Contact:
     conn.close()
 
     return get_contact_by_id(contact_id)
+
+
+def delete_contact(contact_id: int) -> Contact:
+    """
+    Delete contact
+    :param contact_id:
+    :return:
+    """
+
+    deleting = get_contact_by_id(contact_id)
+    conn = engine.connect()
+    conn.execute(contact_table.delete().where(contact_table.c.id == contact_id))
+    conn.close()
+
+    return deleting
