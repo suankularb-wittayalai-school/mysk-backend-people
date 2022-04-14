@@ -8,7 +8,7 @@ from ..database import (
     contact_type_table,
     person_contact_table,
 )
-from mysk_utils.schema import Person, Contact
+from mysk_utils.schema import Person, Contact, QueryPerson
 
 
 def get_person(person_id: int) -> Person:
@@ -86,3 +86,53 @@ def get_all_people() -> List[Person]:
 
     conn.close()
     return people
+
+
+def create_person(person: QueryPerson) -> int:
+    """
+    Create a person in the database.
+    """
+    # print("hi")
+    conn = engine.connect()
+    person_id = conn.execute(
+        people_table.insert().values(
+            prefix_th=person.prefix_th.value,
+            first_name_th=person.first_name_th,
+            middle_name_th=person.middle_name_th,
+            last_name_th=person.last_name_th,
+            prefix_en=person.prefix_en.value,
+            first_name_en=person.first_name_en,
+            middle_name_en=person.middle_name_en,
+            last_name_en=person.last_name_en,
+            birthdate=person.birthdate,
+            citizen_id=person.citizen_id,
+        )
+    ).inserted_primary_key[0]
+
+    if person.contact is not None and len(person.contact) > 0:
+        for contact in person.contact:
+            contact_type_id = conn.execute(
+                select([contact_type_table.c.id]).where(
+                    contact_type_table.c.name == contact.type.value
+                )
+            ).fetchone()[0]
+
+            if contact_type_id is None:
+                raise Exception(f"Contact type {contact.type} not found")
+
+            contact = conn.execute(
+                contact_table.insert().values(
+                    type=contact_type_id,
+                    value=contact.value,
+                    name=contact.name,
+                )
+            ).inserted_primary_key[0]
+
+            conn.execute(
+                person_contact_table.insert().values(
+                    person_id=person_id, contact_id=contact
+                )
+            )
+    conn.close()
+    created_person = get_person(person_id)
+    return created_person

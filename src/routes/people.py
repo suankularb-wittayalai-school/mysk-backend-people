@@ -14,7 +14,7 @@ from db.database import (
     contact_type_table,
     person_contact_table,
 )
-from db.curd.people import get_person, get_all_people
+from db.curd.people import get_person, get_all_people, create_person
 
 router = APIRouter()
 
@@ -54,28 +54,8 @@ def createPerson(person: QueryPerson, response: Response) -> Person:
     TODO: Check permissions fetching person
     """
 
-    with engine.connect() as conn:
-        result = conn.execute(
-            insert(people_table).values(
-                prefix_th=person.prefix_th.value,
-                first_name_th=person.first_name_th,
-                middle_name_th=person.middle_name_th,
-                last_name_th=person.last_name_th,
-                prefix_en=person.prefix_en.value,
-                first_name_en=person.first_name_en,
-                middle_name_en=person.middle_name_en,
-                last_name_en=person.last_name_en,
-                birthdate=person.birthdate,
-                citizen_id=person.citizen_id,
-            )
-        )
-        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
-        inserted_data = conn.execute(
-            select(people_table).where(
-                people_table.c.id == result.inserted_primary_key[0]
-            )
-        ).fetchone()
-        return inserted_data
+    inserted_data = create_person(person)
+    return inserted_data
 
 
 @router.put("/{personId}")
