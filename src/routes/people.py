@@ -26,9 +26,10 @@ router = APIRouter()
 
 
 @router.get("/")
-def getPeople(response: Response) -> List[Person]:
+def get_people_view(response: Response) -> List[Person]:
     """
     Get all people
+
     TODO: Check permissions fetching people
     """
 
@@ -36,9 +37,10 @@ def getPeople(response: Response) -> List[Person]:
 
 
 @router.get("/{personId}")
-def getPerson(personId: int, response: Response) -> Person:
+def get_person_view(personId: int, response: Response) -> Person:
     """
     Get a person
+
     TODO: Check permissions fetching person
     """
     person = get_person(personId)
@@ -54,9 +56,10 @@ def getPerson(personId: int, response: Response) -> Person:
 
 
 @router.post("/", status_code=201)
-def createPerson(person: QueryPerson, response: Response) -> Person:
+def create_person_view(person: QueryPerson, response: Response) -> Person:
     """
     Create a person
+
     TODO: Check permissions fetching person
     """
     try:
@@ -71,9 +74,12 @@ def createPerson(person: QueryPerson, response: Response) -> Person:
 
 
 @router.put("/{personId}")
-def updatePerson(personId: int, person: QueryPerson, response: Response) -> Person:
+def update_person_view(
+    personId: int, person: QueryPerson, response: Response
+) -> Person:
     """
     Update a person
+
     TODO: check permissions before updating
     """
     try:
@@ -90,9 +96,10 @@ def updatePerson(personId: int, person: QueryPerson, response: Response) -> Pers
 
 
 @router.delete("/{personId}")
-def deletePerson(personId: int, response: Response) -> Person:
+def delete_person_view(personId: int, response: Response) -> Person:
     """
     Delete a person
+
     TODO: delete person from database
     """
     try:
@@ -107,9 +114,12 @@ def deletePerson(personId: int, response: Response) -> Person:
 
 
 @router.post("/{personId}/contact")
-def createContact(personId: int, contact: QueryContact, response: Response) -> Person:
+def create_contact_view(
+    personId: int, contact: QueryContact, response: Response
+) -> Person:
     """
     Create a contact
+
     TODO: create a entry in contact table and forign key in people table
     """
 
