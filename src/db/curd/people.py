@@ -166,6 +166,7 @@ def update_person(person_id: int, person: QueryPerson) -> Person:
             citizen_id=person.citizen_id,
         ),
     )
+
     conn.close()
     updated_person = get_person(person_id)
     return updated_person
