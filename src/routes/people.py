@@ -14,7 +14,13 @@ from db.database import (
     contact_type_table,
     person_contact_table,
 )
-from db.curd.people import get_person, get_all_people, create_person, update_person
+from db.curd.people import (
+    get_person,
+    get_all_people,
+    create_person,
+    update_person,
+    delete_person,
+)
 
 router = APIRouter()
 
@@ -89,21 +95,15 @@ def deletePerson(personId: int, response: Response) -> Person:
     Delete a person
     TODO: delete person from database
     """
-
-    with engine.connect() as conn:
-        deleting = conn.execute(
-            select(people_table).where(people_table.c.id == personId)
-        ).fetchone()
-
-        if deleting is None:
-            response.headers["X-INTERNAL-CODE"] = str(
-                InternalCode.IC_GENERIC_BAD_REQUEST.value
-            )
-            return None
-
-        result = conn.execute(delete(people_table).where(people_table.c.id == personId))
-        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
-        return deleting
+    try:
+        deleted_data = delete_person(personId)
+        return deleted_data
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+            headers={"X-INTERNAL-CODE": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
+        )
 
 
 @router.post("/{personId}/contact")

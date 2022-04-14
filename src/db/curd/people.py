@@ -21,7 +21,7 @@ def get_person(person_id: int) -> Person:
     ).fetchone()
 
     if result is None:
-        return None
+        raise Exception(f"Person with id {person_id} not found")
 
     person = Person(**dict(result))
 
@@ -168,3 +168,16 @@ def update_person(person_id: int, person: QueryPerson) -> Person:
     conn.close()
     updated_person = get_person(person_id)
     return updated_person
+
+
+def delete_person(person_id: int) -> Person:
+    """
+    Delete a person from the database.
+    """
+    conn = engine.connect()
+    deleting = get_person(person_id)
+    if deleting is None:
+        raise Exception(f"Person with id {person_id} not found")
+    conn.execute(people_table.delete().where(people_table.c.id == person_id))
+    conn.close()
+    return deleting
