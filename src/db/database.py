@@ -41,12 +41,12 @@ contact_table = Table(
     Column("value", String(50), nullable=False),
 )
 
-person_contact_types_table = Table(
-    "people_contact_types",
+person_contact_table = Table(
+    "people_contact",
     metadata,
     Column("id", Integer, primary_key=True),
     Column("person_id", Integer, ForeignKey("people.id")),
-    Column("contact_type_id", Integer, ForeignKey("contact.id")),
+    Column("contact_id", Integer, ForeignKey("contact.id")),
 )
 
 people_table = Table(

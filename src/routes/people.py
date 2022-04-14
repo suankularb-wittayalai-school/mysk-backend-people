@@ -1,13 +1,19 @@
 from fastapi import APIRouter, Response
 
 from mysk_utils.response import InternalCode
-from mysk_utils.schema import QueryPerson, Person
+from mysk_utils.schema import QueryPerson, Person, QueryContact, Contact
 from typing import List
 
 from sqlalchemy import insert, update, delete, select
 
 
-from db.database import engine, people_table
+from db.database import (
+    engine,
+    people_table,
+    contact_table,
+    contact_type_table,
+    person_contact_table,
+)
 
 
 router = APIRouter()
@@ -67,14 +73,19 @@ def createPerson(person: QueryPerson, response: Response) -> Person:
             )
         )
         response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
-        return dict(result.lastrowid)
+        inserted_data = conn.execute(
+            select(people_table).where(
+                people_table.c.id == result.inserted_primary_key[0]
+            )
+        ).fetchone()
+        return inserted_data
 
 
 @router.put("/{personId}")
 def updatePerson(personId: int, person: QueryPerson, response: Response) -> Person:
     """
     Update a person
-    TODO: make all fields in QueryPerson optional
+    TODO: check permissions before updating
     """
 
     with engine.connect() as conn:
@@ -102,6 +113,103 @@ def updatePerson(personId: int, person: QueryPerson, response: Response) -> Pers
 
 
 @router.delete("/{personId}")
-def deletePerson(personId: int):
-    # TODO: delete person from database
-    return {"internalCode": InternalCode.IC_FOR_FUTURE_IMPLEMENTATION}
+def deletePerson(personId: int, response: Response) -> Person:
+    """
+    Delete a person
+    TODO: delete person from database
+    """
+
+    with engine.connect() as conn:
+        deleting = conn.execute(
+            select(people_table).where(people_table.c.id == personId)
+        ).fetchone()
+
+        if deleting is None:
+            response.headers["X-INTERNAL-CODE"] = str(
+                InternalCode.IC_GENERIC_BAD_REQUEST.value
+            )
+            return None
+
+        result = conn.execute(delete(people_table).where(people_table.c.id == personId))
+        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+        return deleting
+
+
+@router.post("/{personId}/contact")
+def createContact(personId: int, contact: QueryContact, response: Response) -> Person:
+    """
+    Create a contact
+    TODO: create a entry in contact table and forign key in people table
+    """
+
+    with engine.connect() as conn:
+        person: Person = conn.execute(
+            select(people_table).where(people_table.c.id == personId)
+        ).fetchone()
+
+        if person is None:
+            response.headers["X-INTERNAL-CODE"] = str(
+                InternalCode.IC_GENERIC_BAD_REQUEST.value
+            )
+            return None
+
+        contact_type = conn.execute(
+            select(contact_type_table).where(
+                contact_type_table.c.name == contact.type.value
+            )
+        ).fetchone()
+        if contact_type is None:
+            response.headers["X-INTERNAL-CODE"] = str(
+                InternalCode.IC_GENERIC_BAD_REQUEST.value
+            )
+            return None
+        contact = conn.execute(
+            insert(contact_table).values(
+                type=contact_type.id,
+                value=contact.value,
+                name=contact.name,
+            )
+        )
+
+        person_contact_type = conn.execute(
+            insert(person_contact_table).values(
+                person_id=personId,
+                contact_id=contact.inserted_primary_key[0],
+            )
+        )
+
+        contacts = conn.execute(
+            select(person_contact_table).where(
+                person_contact_table.c.person_id == personId
+            )
+        ).fetchall()
+
+        contact_id = [contact.contact_id for contact in contacts]
+
+        contact_data = conn.execute(
+            select(
+                contact_table.c.id,
+                contact_type_table.c.name,
+                contact_table.c.value,
+                contact_table.c.name,
+            )
+            .join(contact_type_table, contact_type_table.c.id == contact_table.c.type)
+            .where(contact_table.c.id.in_(contact_id))
+            .order_by(contact_table.c.id)
+        ).fetchall()
+
+        # print contact type
+        contact_data = [
+            Contact(
+                id=contact["id"],
+                name=contact["name_1"],
+                type=contact["name"],
+                value=contact["value"],
+            )
+            for contact in [dict(contact) for contact in contact_data]
+        ]
+        person = Person(**dict(person))
+        person.contact = contact_data
+
+        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+        return person
