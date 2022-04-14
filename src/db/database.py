@@ -10,7 +10,6 @@ from sqlalchemy import (
     # Boolean,
     # Constraint,
 )
-from enum import Enum
 from dotenv import load_dotenv
 import os
 

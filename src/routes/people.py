@@ -4,7 +4,7 @@ from mysk_utils.response import InternalCode
 from mysk_utils.schema import QueryPerson, Person, QueryContact, Contact
 from typing import List
 
-from sqlalchemy import insert, update, delete, select
+from sqlalchemy import insert, select
 
 
 from db.database import (
@@ -142,7 +142,7 @@ def createContact(personId: int, contact: QueryContact, response: Response) -> P
             )
         )
 
-        person_contact_type = conn.execute(
+        conn.execute(
             insert(person_contact_table).values(
                 person_id=personId,
                 contact_id=contact.inserted_primary_key[0],
