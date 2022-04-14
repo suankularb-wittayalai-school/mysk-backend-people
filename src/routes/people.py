@@ -25,8 +25,8 @@ from db.curd.contact import (
 router = APIRouter()
 
 
-@router.get("/")
-def get_people_view(response: Response) -> List[Person]:
+@router.get("/", response_model=List[Person])
+def get_people_view(response: Response):
     """
     Get all people
 
@@ -36,8 +36,8 @@ def get_people_view(response: Response) -> List[Person]:
     return get_all_people()
 
 
-@router.get("/{personId}")
-def get_person_view(personId: int, response: Response) -> Person:
+@router.get("/{personId}", response_model=Person)
+def get_person_view(personId: int, response: Response):
     """
     Get a person
 
@@ -55,8 +55,8 @@ def get_person_view(personId: int, response: Response) -> Person:
     return person
 
 
-@router.post("/", status_code=201)
-def create_person_view(person: QueryPerson, response: Response) -> Person:
+@router.post("/", status_code=201, response_model=Person)
+def create_person_view(person: QueryPerson, response: Response):
     """
     Create a person
 
@@ -64,6 +64,7 @@ def create_person_view(person: QueryPerson, response: Response) -> Person:
     """
     try:
         inserted_data = create_person(person)
+        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return inserted_data
     except Exception as e:
         raise HTTPException(
@@ -73,10 +74,8 @@ def create_person_view(person: QueryPerson, response: Response) -> Person:
         )
 
 
-@router.put("/{personId}")
-def update_person_view(
-    personId: int, person: QueryPerson, response: Response
-) -> Person:
+@router.put("/{personId}", response_model=Person)
+def update_person_view(personId: int, person: QueryPerson, response: Response):
     """
     Update a person
 
@@ -84,6 +83,7 @@ def update_person_view(
     """
     try:
         updated_data = update_person(personId, person)
+        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return updated_data
     except Exception as e:
         raise HTTPException(
@@ -95,8 +95,8 @@ def update_person_view(
     # return {"internalCode": InternalCode.IC_FOR_FUTURE_IMPLEMENTATION}
 
 
-@router.delete("/{personId}")
-def delete_person_view(personId: int, response: Response) -> Person:
+@router.delete("/{personId}", response_model=Person)
+def delete_person_view(personId: int, response: Response):
     """
     Delete a person
 
@@ -104,6 +104,7 @@ def delete_person_view(personId: int, response: Response) -> Person:
     """
     try:
         deleted_data = delete_person(personId)
+        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return deleted_data
     except Exception as e:
         raise HTTPException(
@@ -113,10 +114,8 @@ def delete_person_view(personId: int, response: Response) -> Person:
         )
 
 
-@router.post("/{personId}/contact")
-def create_contact_view(
-    personId: int, contact: QueryContact, response: Response
-) -> Person:
+@router.post("/{personId}/contact", response_model=Person)
+def create_contact_view(personId: int, contact: QueryContact, response: Response):
     """
     Create a contact
 
