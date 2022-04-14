@@ -7,7 +7,7 @@ from ..database import (
     person_contact_table,
 )
 from mysk_utils.schema import Person, Contact, QueryPerson
-from .contact import get_contact_by_id, create_contact
+from .contact import get_contacts_by_id, create_contact
 
 
 def get_person_contact(person_id: int) -> List[Contact]:
@@ -21,9 +21,9 @@ def get_person_contact(person_id: int) -> List[Contact]:
         )
     ).fetchall()
 
-    contacts = [get_contact_by_id(contact.contact_id) for contact in result]
+    contact_ids = [contact.contact_id for contact in result]
     conn.close()
-    return contacts
+    return get_contacts_by_id(contact_ids)
 
 
 def get_person(person_id: int) -> Person:

@@ -3,6 +3,7 @@ from ..database import contact_table, contact_type_table, engine
 from mysk_utils.schema import Contact, QueryContact
 
 from sqlalchemy import select
+from typing import List
 
 
 def get_contact_by_id(contact_id: int) -> Contact:
@@ -25,6 +26,31 @@ def get_contact_by_id(contact_id: int) -> Contact:
     return Contact(
         id=contact.id, type=contact["name_1"], value=contact.value, name=contact.name
     )
+
+
+def get_contacts_by_id(contact_ids: list) -> List[Contact]:
+    """
+    Get contacts by id
+    :param contact_ids:
+    :return:
+    """
+    conn = engine.connect()
+    contacts = conn.execute(
+        select([contact_table, contact_type_table])
+        .where(contact_table.c.id.in_(contact_ids))
+        .join(contact_type_table, contact_table.c.type == contact_type_table.c.id)
+    ).fetchall()
+    conn.close()
+
+    return [
+        Contact(
+            id=contact.id,
+            type=contact["name_1"],
+            value=contact.value,
+            name=contact.name,
+        )
+        for contact in contacts
+    ]
 
 
 def create_contact(contact: QueryContact) -> Contact:
