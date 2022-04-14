@@ -14,7 +14,7 @@ from db.database import (
     contact_type_table,
     person_contact_table,
 )
-
+from db.curd.people import get_person, get_all_people
 
 router = APIRouter()
 
@@ -25,10 +25,8 @@ def getPeople(response: Response) -> List[Person]:
     Get all people
     TODO: Check permissions fetching people
     """
-    with engine.connect() as conn:
-        result = conn.execute(select(people_table)).fetchall()
-        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
-        return result
+
+    return get_all_people()
 
 
 @router.get("/{personId}")
@@ -37,17 +35,16 @@ def getPerson(personId: int, response: Response) -> Person:
     Get a person
     TODO: Check permissions fetching person
     """
-    with engine.connect() as conn:
-        result = conn.execute(
-            select(people_table).where(people_table.c.id == personId)
-        ).fetchone()
-        if result is None:
-            response.headers["X-INTERNAL-CODE"] = str(
-                InternalCode.IC_GENERIC_BAD_REQUEST.value
-            )
-            return None
-        response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
-        return dict(result)
+    person = get_person(personId)
+
+    if person is None:
+        response.headers["X-INTERNAL-CODE"] = str(
+            InternalCode.IC_GENERIC_BAD_REQUEST.value
+        )
+        return None
+
+    response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+    return person
 
 
 @router.post("/", status_code=201)
