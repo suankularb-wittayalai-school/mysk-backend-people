@@ -1,17 +1,12 @@
 from fastapi import APIRouter, Response, HTTPException
 
 from mysk_utils.response import InternalCode
-from mysk_utils.schema import QueryPerson, Person, QueryContact, Contact
+from mysk_utils.schema import QueryPerson, Person, QueryContact
 from typing import List
-
-from sqlalchemy import insert, select
 
 
 from db.database import (
     engine,
-    people_table,
-    contact_table,
-    contact_type_table,
     person_contact_table,
 )
 from db.curd.people import (
