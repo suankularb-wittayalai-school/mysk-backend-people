@@ -23,7 +23,7 @@ def get_person_contact(person_id: int) -> List[Contact]:
         )
     ).fetchall()
 
-    contacts = [get_contact_by_id(contact.id) for contact in result]
+    contacts = [get_contact_by_id(contact.contact_id) for contact in result]
     conn.close()
     return contacts
 

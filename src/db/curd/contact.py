@@ -50,3 +50,33 @@ def create_contact(contact: QueryContact) -> Contact:
     conn.close()
 
     return get_contact_by_id(contact)
+
+
+def update_contact(contact_id: int, contact: QueryContact) -> Contact:
+    """
+    Update contact
+    :param contact:
+    :return:
+    """
+    conn = engine.connect()
+    contact_type_id = conn.execute(
+        select([contact_type_table.c.id]).where(
+            contact_type_table.c.name == contact.type.value
+        )
+    ).fetchone()[0]
+
+    if contact_type_id is None:
+        raise Exception(f"Contact type {contact.type} not found")
+
+    conn.execute(
+        contact_table.update()
+        .where(contact_table.c.id == contact_id)
+        .values(
+            type=contact_type_id,
+            value=contact.value,
+            name=contact.name,
+        )
+    )
+    conn.close()
+
+    return get_contact_by_id(contact_id)
