@@ -9,6 +9,7 @@ from ..database import (
     person_contact_table,
 )
 from mysk_utils.schema import Person, Contact, QueryPerson
+from .contact import get_contact_by_id, create_contact
 
 
 def get_person(person_id: int) -> Person:
