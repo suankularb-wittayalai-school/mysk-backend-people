@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Response, HTTPException
-from typing import List
 
 from mysk_utils.response import InternalCode
 from mysk_utils.schema import Contact, QueryContact
