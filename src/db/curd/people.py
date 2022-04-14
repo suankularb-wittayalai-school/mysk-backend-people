@@ -12,6 +12,22 @@ from mysk_utils.schema import Person, Contact, QueryPerson
 from .contact import get_contact_by_id, create_contact
 
 
+def get_person_contact(person_id: int) -> List[Contact]:
+    """
+    Get all contacts of a person from the database.
+    """
+    conn = engine.connect()
+    result = conn.execute(
+        select([person_contact_table]).where(
+            person_contact_table.c.person_id == person_id
+        )
+    ).fetchall()
+
+    contacts = [get_contact_by_id(contact.id) for contact in result]
+    conn.close()
+    return contacts
+
+
 def get_person(person_id: int) -> Person:
     """
     Get a person from the database.
@@ -26,27 +42,29 @@ def get_person(person_id: int) -> Person:
 
     person = Person(**dict(result))
 
-    contacts = conn.execute(
-        select([contact_table, person_contact_table, contact_type_table])
-        .join(contact_table, person_contact_table.c.contact_id == contact_table.c.id)
-        .join(contact_type_table, contact_type_table.c.id == contact_table.c.type)
-        .where(person_contact_table.c.person_id == person_id)
-        .order_by(contact_table.c.id)
-    ).fetchall()
+    # contacts = conn.execute(
+    #     select([contact_table, person_contact_table, contact_type_table])
+    #     .join(contact_table, person_contact_table.c.contact_id == contact_table.c.id)
+    #     .join(contact_type_table, contact_type_table.c.id == contact_table.c.type)
+    #     .where(person_contact_table.c.person_id == person_id)
+    #     .order_by(contact_table.c.id)
+    # ).fetchall()
 
-    formatted_contact = [
-        Contact(
-            **{
-                "id": contact.id,
-                "type": contact["name_1"],
-                "value": contact.value,
-                "name": contact.name,
-            }
-        )
-        for contact in contacts
-    ]
+    # formatted_contact = [
+    #     Contact(
+    #         **{
+    #             "id": contact.id,
+    #             "type": contact["name_1"],
+    #             "value": contact.value,
+    #             "name": contact.name,
+    #         }
+    #     )
+    #     for contact in contacts
+    # ]
 
-    person.contact = formatted_contact
+    # same as above
+    person.contact = get_person_contact(person_id)
+
     conn.close()
     return person
 
@@ -61,29 +79,29 @@ def get_all_people() -> List[Person]:
     people = [Person(**dict(person)) for person in result]
 
     for person in people:
-        contacts = conn.execute(
-            select([contact_table, person_contact_table, contact_type_table])
-            .join(
-                contact_table, person_contact_table.c.contact_id == contact_table.c.id
-            )
-            .join(contact_type_table, contact_type_table.c.id == contact_table.c.type)
-            .where(person_contact_table.c.person_id == person.id)
-            .order_by(contact_table.c.id)
-        ).fetchall()
+        # contacts = conn.execute(
+        #     select([contact_table, person_contact_table, contact_type_table])
+        #     .join(
+        #         contact_table, person_contact_table.c.contact_id == contact_table.c.id
+        #     )
+        #     .join(contact_type_table, contact_type_table.c.id == contact_table.c.type)
+        #     .where(person_contact_table.c.person_id == person.id)
+        #     .order_by(contact_table.c.id)
+        # ).fetchall()
 
-        formatted_contact = [
-            Contact(
-                **{
-                    "id": contact.id,
-                    "type": contact["name_1"],
-                    "value": contact.value,
-                    "name": contact.name,
-                }
-            )
-            for contact in contacts
-        ]
+        # formatted_contact = [
+        #     Contact(
+        #         **{
+        #             "id": contact.id,
+        #             "type": contact["name_1"],
+        #             "value": contact.value,
+        #             "name": contact.name,
+        #         }
+        #     )
+        #     for contact in contacts
+        # ]
 
-        person.contact = formatted_contact
+        person.contact = get_person_contact(person.id)
 
     conn.close()
     return people
@@ -112,26 +130,10 @@ def create_person(person: QueryPerson) -> int:
 
     if person.contact is not None and len(person.contact) > 0:
         for contact in person.contact:
-            contact_type_id = conn.execute(
-                select([contact_type_table.c.id]).where(
-                    contact_type_table.c.name == contact.type.value
-                )
-            ).fetchone()[0]
-
-            if contact_type_id is None:
-                raise Exception(f"Contact type {contact.type} not found")
-
-            contact = conn.execute(
-                contact_table.insert().values(
-                    type=contact_type_id,
-                    value=contact.value,
-                    name=contact.name,
-                )
-            ).inserted_primary_key[0]
-
+            contacts = create_contact(contact)
             conn.execute(
                 person_contact_table.insert().values(
-                    person_id=person_id, contact_id=contact
+                    person_id=person_id, contact_id=contacts.id
                 )
             )
     conn.close()
