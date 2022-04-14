@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get("/{contactId}", response_model=Contact)
-async def get_contact(contactId: int, response: Response):
+async def get_contact_view(contactId: int, response: Response):
     """
     Get contact by id
     """
