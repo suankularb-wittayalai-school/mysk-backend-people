@@ -125,3 +125,14 @@ def update_student(student: Student) -> Student:
     student = get_student_by_id(student.id)
     conn.close()
     return student
+
+
+def delete_student(studentId: int) -> Student:
+    """
+    Delete student
+    """
+    conn = engine.connect()
+    deleting = get_student_by_id(studentId)
+    conn.execute(student_table.delete().where(student_table.c.id == studentId))
+    conn.close()
+    return deleting

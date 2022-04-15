@@ -6,6 +6,7 @@ from db.curd.student import (
     get_student_by_id,
     get_students,
     update_student,
+    delete_student,
 )
 
 from mysk_utils.schema import Student, QueryStudent
@@ -62,6 +63,20 @@ def update_student_view(student: Student, response: Response):
         updated = update_student(student)
         response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return updated
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+            headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
+        )
+
+
+@router.delete("/{student_id}", response_model=Student)
+def delete_student_view(student_id: int, response: Response):
+    try:
+        deleted = delete_student(student_id)
+        response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+        return deleted
     except Exception as e:
         raise HTTPException(
             status_code=400,
