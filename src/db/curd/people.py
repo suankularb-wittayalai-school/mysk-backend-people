@@ -105,7 +105,7 @@ def get_all_people() -> List[Person]:
     return people
 
 
-def create_person(person: QueryPerson) -> int:
+def create_person(person: QueryPerson) -> Person:
     """
     Create a person in the database.
     """
