@@ -1,6 +1,5 @@
-from turtle import st
 from typing import List
-from ..database import engine, student_table, people_table, person_contact_table
+from ..database import engine, student_table, people_table
 
 from sqlalchemy import select
 

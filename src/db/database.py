@@ -1,4 +1,3 @@
-from enum import unique
 from sqlalchemy import create_engine
 from sqlalchemy import (
     Table,
