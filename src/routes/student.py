@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Response, HTTPException
 from typing import List
 
-from db.curd.student import create_student, get_student_by_id, get_students
+from db.curd.student import (
+    create_student,
+    get_student_by_id,
+    get_students,
+    update_student,
+)
 
 from mysk_utils.schema import Student, QueryStudent
 from mysk_utils.response import InternalCode
@@ -43,6 +48,20 @@ def create_student_view(student: QueryStudent, response: Response):
         response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return student
 
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+            headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
+        )
+
+
+@router.put("/", response_model=Student)
+def update_student_view(student: Student, response: Response):
+    try:
+        updated = update_student(student)
+        response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+        return updated
     except Exception as e:
         raise HTTPException(
             status_code=400,
