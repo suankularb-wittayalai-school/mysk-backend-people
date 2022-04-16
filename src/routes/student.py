@@ -33,8 +33,8 @@ def get_student_view(student_id: int, response: Response):
     student = get_student_by_id(student_id)
     if student is None:
         raise HTTPException(
-            status_code=404,
-            detail="Student not found",
+            status_code=400,
+            detail=f"Student with id {student_id} not found",
             headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
         )
 
