@@ -85,7 +85,12 @@ def create_person(person: QueryPerson) -> Person:
 
     if person.contact is not None and len(person.contact) > 0:
         for contact in person.contact:
-            contacts = update_contact(contact)
+            contacts = create_contact(contact)
+            conn.execute(
+                person_contact_table.insert().values(
+                    person_id=person_id, contact_id=contacts.id
+                )
+            )
     conn.close()
     created_person = get_person(person_id)
     return created_person
@@ -121,12 +126,7 @@ def update_person(person: Person) -> Person:
 
     if person.contact is not None and len(person.contact) > 0:
         for contact in person.contact:
-            contacts = create_contact(contact)
-            conn.execute(
-                person_contact_table.insert().values(
-                    person_id=person.id, contact_id=contacts.id
-                )
-            )
+            contacts = update_contact(contact)
 
     conn.close()
     updated_person = get_person(person.id)

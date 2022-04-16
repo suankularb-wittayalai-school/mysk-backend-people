@@ -12,11 +12,21 @@ def pytest_unconfigure(config):
     del sys._called_from_test
 
 
-# delete everything in test database before each test
+# make sure test.db dont exit before test session
+def pytest_sessionstart(session):
+    if os.path.exists("test.db"):
+        os.remove("test.db")
+
+
+# create everything in test database before each test
 def pytest_runtest_setup(item):
-    metadata.drop_all(engine)
     metadata.create_all(engine)
     # pass
+
+
+# delete test database after end of test session
+def pytest_runtest_teardown(item):
+    metadata.drop_all(engine)
 
 
 # delete test database after end of test session
