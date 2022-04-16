@@ -65,7 +65,7 @@ people_table = Table(
     Column("middle_name_en", String, nullable=True),
     Column("last_name_en", String),
     Column("birthdate", Date),
-    Column("citizen_id", String),
+    Column("citizen_id", String, unique=True),
 )
 
 student_table = Table(
