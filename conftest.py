@@ -14,9 +14,8 @@ def pytest_unconfigure(config):
 
 # delete everything in test database before each test
 def pytest_runtest_setup(item):
-    if "test_" in item.name:
-        metadata.drop_all(engine)
-        metadata.create_all(engine)
+    metadata.drop_all(engine)
+    metadata.create_all(engine)
     # pass
 
 
