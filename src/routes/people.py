@@ -43,7 +43,14 @@ def get_person_view(personId: int, response: Response):
 
     TODO: Check permissions fetching person
     """
-    person = get_person(personId)
+    try:
+        person = get_person(personId)
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Person with id {personId} not found",
+            headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
+        )
 
     if person is None:
         response.headers["X-INTERNAL-CODE"] = str(
