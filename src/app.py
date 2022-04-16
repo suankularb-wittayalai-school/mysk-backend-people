@@ -7,7 +7,7 @@ import os
 
 from mysk_utils.response import InternalCode
 
-from routes import people, contacts
+from routes import people, contacts, student
 
 load_dotenv()
 
@@ -15,6 +15,7 @@ app = FastAPI()
 
 app.include_router(people.router, prefix="/people", tags=["people"])
 app.include_router(contacts.router, prefix="/contacts", tags=["contacts"])
+app.include_router(student.router, prefix="/student", tags=["student"])
 
 
 @app.get("/")
