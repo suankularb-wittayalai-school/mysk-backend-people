@@ -31,4 +31,8 @@ def pytest_runtest_teardown(item):
 
 # delete test database after end of test session
 def pytest_sessionfinish(session, exitstatus):
-    os.remove("test.db")
+    # make sure test.db is not being used by other tests/program
+    try:
+        os.remove("test.db")
+    except PermissionError:
+        pass

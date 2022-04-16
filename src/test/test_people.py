@@ -5,7 +5,7 @@ from db.curd.people import create_person
 
 
 from mysk_utils.response import InternalCode
-from mysk_utils.schema import QueryPerson, QueryContact
+from mysk_utils.schema import QueryPerson
 
 client = TestClient(app)
 

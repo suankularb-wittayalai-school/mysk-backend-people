@@ -79,7 +79,7 @@ student_table = Table(
     metadata,
     Column("id", Integer, primary_key=True),
     Column("person_id", Integer, ForeignKey("people.id")),
-    Column("student_id", String),
+    Column("student_id", String, unique=True),
 )
 
 teacher_table = Table(
