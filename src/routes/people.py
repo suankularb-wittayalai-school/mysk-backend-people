@@ -74,15 +74,15 @@ def create_person_view(person: QueryPerson, response: Response):
         )
 
 
-@router.put("/{personId}", response_model=Person)
-def update_person_view(personId: int, person: QueryPerson, response: Response):
+@router.put("/", response_model=Person)
+def update_person_view(person: Person, response: Response):
     """
     Update a person
 
     TODO: check permissions before updating
     """
     try:
-        updated_data = update_person(personId, person)
+        updated_data = update_person(person)
         response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return updated_data
     except Exception as e:
