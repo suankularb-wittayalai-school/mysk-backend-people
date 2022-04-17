@@ -48,7 +48,7 @@ def get_person_view(personId: int, response: Response):
     except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail=f"Person with id {personId} not found",
+            detail=str(e),
             headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
         )
 

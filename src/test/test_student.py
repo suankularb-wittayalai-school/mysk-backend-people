@@ -4,7 +4,7 @@ from app import app
 from db.curd.student import create_student
 
 from mysk_utils.response import InternalCode
-from mysk_utils.schema import QueryStudent, Student, Contact
+from mysk_utils.schema import QueryStudent, Student
 
 client = TestClient(app)
 
@@ -112,8 +112,6 @@ def test_update_student_with_contact():
             }
         ],
     }
-
-    before = Student(**studentjson)
 
     studentjson["contact"][0]["value"] = "john"
     studentjson["last_name_th"] = "ดอนดากุน"

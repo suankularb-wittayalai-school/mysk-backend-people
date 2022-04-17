@@ -3,7 +3,7 @@ from ..database import engine, student_table, people_table
 
 from sqlalchemy import select
 
-from db.curd.people import create_person, get_person, get_person_contact, update_person
+from db.curd.people import create_person, get_person_contact, update_person
 
 
 from mysk_utils.schema import Student, QueryStudent, QueryPerson, Person

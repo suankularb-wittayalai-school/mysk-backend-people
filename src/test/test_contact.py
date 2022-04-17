@@ -51,7 +51,7 @@ def test_get_contact():
 def test_get_contact_with_invalid_id():
     response = client.get("/contacts/99")
     assert response.status_code == 200
-    assert response.json() == None
+    assert response.json() is None
 
 
 def test_update_contact():
@@ -86,10 +86,10 @@ def test_delete_contact():
 
     response = client.get("/contacts/1")
     assert response.status_code == 200
-    assert response.json() == None
+    assert response.json() is None
 
 
 def test_delete_contact_with_invalid_id():
     response = client.delete("/contacts/99")
     assert response.status_code == 200
-    assert response.json() == None
+    assert response.json() is None

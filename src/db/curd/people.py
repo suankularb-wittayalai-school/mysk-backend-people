@@ -126,7 +126,7 @@ def update_person(person: Person) -> Person:
 
     if person.contact is not None and len(person.contact) > 0:
         for contact in person.contact:
-            contacts = update_contact(contact)
+            update_contact(contact)
 
     conn.close()
     updated_person = get_person(person.id)
