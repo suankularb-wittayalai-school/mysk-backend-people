@@ -30,7 +30,7 @@ jobs:
         env:
           HOST: localhost
           PORT: 5000
-          DATABASE_URL: sqlite:///test.db
+          DATABASE_URL: sqlite:///data.db
 
       - name: Run Lint
         run: |
