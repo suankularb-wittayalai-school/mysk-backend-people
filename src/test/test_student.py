@@ -80,7 +80,7 @@ def test_create_student_with_contact():
     }
     response = client.post("/student/", json=studentjson)
 
-    studentjson["contact"][0]["id"] = 1
+    studentjson["contact"][0]["id"] = 4
 
     expected = Student(**studentjson, id=3)
 
@@ -88,4 +88,62 @@ def test_create_student_with_contact():
     assert Student(**response.json()) == expected
     assert response.headers["X-Internal-Code"] == str(
         InternalCode.IC_GENERIC_SUCCESS.value
+    )
+
+
+def test_update_student_with_contact():
+    studentjson = {
+        "id": 3,
+        "prefix_en": "Mr.",
+        "prefix_th": "นาย",
+        "first_name_en": "John",
+        "first_name_th": "จอห์น",
+        "last_name_en": "Doe",
+        "last_name_th": "ดอนดา",
+        "birthdate": "2000-01-01",
+        "citizen_id": "1234567890128",
+        "std_id": "88880",
+        "contact": [
+            {
+                "id": "4",
+                "type": "Email",
+                "value": "john@example.com",
+                "name": "John Doe",
+            }
+        ],
+    }
+
+    before = Student(**studentjson)
+
+    studentjson["contact"][0]["value"] = "john"
+    studentjson["last_name_th"] = "ดอนดากุน"
+    after = Student(**studentjson)
+
+    response = client.put("/student/", json=studentjson)
+    assert response.status_code == 200
+    assert Student(**response.json()) == after
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_SUCCESS.value
+    )
+
+
+def test_update_student_with_invalid_id():
+    studentjson = {
+        "id": 99,
+        "prefix_en": "Mr.",
+        "prefix_th": "นาย",
+        "first_name_en": "John",
+        "first_name_th": "จอห์น",
+        "last_name_en": "Doe",
+        "last_name_th": "ดอนดา",
+        "birthdate": "2000-01-01",
+        "citizen_id": "1234567890128",
+        "std_id": "88880",
+    }
+
+    response = client.put("/student/", json=studentjson)
+    assert response.status_code == 400
+    assert response.json()["detail"] is not None
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_BAD_REQUEST.value
     )

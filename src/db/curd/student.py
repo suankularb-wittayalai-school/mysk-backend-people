@@ -6,7 +6,7 @@ from sqlalchemy import select
 from db.curd.people import create_person, get_person, get_person_contact, update_person
 
 
-from mysk_utils.schema import Student, QueryStudent, QueryPerson
+from mysk_utils.schema import Student, QueryStudent, QueryPerson, Person
 
 
 def get_student_by_id(id: int) -> Student:
@@ -56,6 +56,7 @@ def create_student(student: QueryStudent) -> Student:
     Create student
     """
     conn = engine.connect()
+
     person = QueryPerson(
         prefix_th=student.prefix_th.value,
         prefix_en=student.prefix_en.value,
@@ -86,6 +87,14 @@ def update_student(student: Student) -> Student:
     Update student
     """
     conn = engine.connect()
+
+    student_id = conn.execute(
+        student_table.select().where(student_table.c.id == student.id)
+    ).fetchone()
+
+    if student_id is None:
+        return None
+
     person = conn.execute(
         select([people_table])
         .where(people_table.c.citizen_id == student.citizen_id)
@@ -96,7 +105,20 @@ def update_student(student: Student) -> Student:
         return None
 
     person_id = person["id"]
-    person = get_person(person_id)
+    person = Person(
+        id=person_id,
+        prefix_th=student.prefix_th.value,
+        prefix_en=student.prefix_en.value,
+        first_name_th=student.first_name_th,
+        first_name_en=student.first_name_en,
+        last_name_th=student.last_name_th,
+        last_name_en=student.last_name_en,
+        middle_name_th=student.middle_name_th,
+        middle_name_en=student.middle_name_en,
+        contact=student.contact,
+        birthdate=student.birthdate,
+        citizen_id=student.citizen_id,
+    )
 
     person = update_person(person)
 
