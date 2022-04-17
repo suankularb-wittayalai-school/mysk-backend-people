@@ -147,3 +147,61 @@ def test_update_student_with_invalid_id():
     assert response.headers["X-Internal-Code"] == str(
         InternalCode.IC_GENERIC_BAD_REQUEST.value
     )
+
+
+def test_update_student_with_invalid_contact_id():
+    studentjson = {
+        "id": 3,
+        "prefix_en": "Mr.",
+        "prefix_th": "นาย",
+        "first_name_en": "John",
+        "first_name_th": "จอห์น",
+        "last_name_en": "Doe",
+        "last_name_th": "ดอนดา",
+        "birthdate": "2000-01-01",
+        "citizen_id": "1234567890128",
+        "std_id": "88880",
+        "contact": [
+            {
+                "id": "99",
+                "type": "Email",
+                "value": "john@example.com",
+                "name": "John Doe",
+            }
+        ],
+    }
+
+    response = client.put("/student/", json=studentjson)
+    assert response.status_code == 400
+    assert response.json()["detail"] is not None
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_BAD_REQUEST.value
+    )
+
+
+def test_delete_student_with_invalid_id():
+    response = client.delete("/student/99")
+    assert response.status_code == 400
+    assert response.json()["detail"] is not None
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_BAD_REQUEST.value
+    )
+
+
+def test_delete_student_with_valid_id():
+
+    response = client.delete("/student/3")
+    assert response.status_code == 200
+    assert response.json() is not None
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_SUCCESS.value
+    )
+
+    response = client.get(
+        "/student/3/",
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Student with id 3 not found"}
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_BAD_REQUEST.value
+    )
