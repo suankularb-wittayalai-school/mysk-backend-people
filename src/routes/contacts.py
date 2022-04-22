@@ -48,15 +48,13 @@ async def create_contact_view(query: QueryContact, response: Response):
         )
 
 
-@router.put("/{contactId}", response_model=Contact)
-async def update_contact_view(
-    contactId: int, query: QueryContact, response: Response
-) -> Contact:
+@router.put("/", response_model=Contact)
+async def update_contact_view(contact: Contact, response: Response) -> Contact:
     """
     Update a contact
     """
     try:
-        contact = update_contact(contactId, query)
+        contact = update_contact(contact)
         response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return contact
     except Exception as e:

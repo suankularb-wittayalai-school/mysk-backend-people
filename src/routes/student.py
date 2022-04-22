@@ -33,8 +33,8 @@ def get_student_view(student_id: int, response: Response):
     student = get_student_by_id(student_id)
     if student is None:
         raise HTTPException(
-            status_code=404,
-            detail="Student not found",
+            status_code=400,
+            detail=f"Student with id {student_id} not found",
             headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
         )
 
@@ -61,6 +61,17 @@ def create_student_view(student: QueryStudent, response: Response):
 def update_student_view(student: Student, response: Response):
     try:
         updated = update_student(student)
+
+        if updated is None:
+            # print("it dies")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Student with id {student.id} not found",
+                headers={
+                    "X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)
+                },
+            )
+
         response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return updated
     except Exception as e:
@@ -75,6 +86,16 @@ def update_student_view(student: Student, response: Response):
 def delete_student_view(student_id: int, response: Response):
     try:
         deleted = delete_student(student_id)
+
+        if deleted is None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Student with id {student_id} not found",
+                headers={
+                    "X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)
+                },
+            )
+
         response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return deleted
     except Exception as e:

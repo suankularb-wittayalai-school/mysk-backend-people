@@ -43,7 +43,14 @@ def get_person_view(personId: int, response: Response):
 
     TODO: Check permissions fetching person
     """
-    person = get_person(personId)
+    try:
+        person = get_person(personId)
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+            headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
+        )
 
     if person is None:
         response.headers["X-INTERNAL-CODE"] = str(
@@ -74,15 +81,15 @@ def create_person_view(person: QueryPerson, response: Response):
         )
 
 
-@router.put("/{personId}", response_model=Person)
-def update_person_view(personId: int, person: QueryPerson, response: Response):
+@router.put("/", response_model=Person)
+def update_person_view(person: Person, response: Response):
     """
     Update a person
 
     TODO: check permissions before updating
     """
     try:
-        updated_data = update_person(personId, person)
+        updated_data = update_person(person)
         response.headers["X-INTERNAL-CODE"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
         return updated_data
     except Exception as e:

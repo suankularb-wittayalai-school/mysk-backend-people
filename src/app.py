@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 # from starlette.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -18,9 +18,10 @@ app.include_router(contacts.router, prefix="/contacts", tags=["contacts"])
 app.include_router(student.router, prefix="/student", tags=["student"])
 
 
-@app.get("/")
-def healthCheck():
-    return {"status": True, "internalCode": InternalCode.IC_GENERIC_SUCCESS}
+@app.get("/", status_code=200, response_description="Welcome to MySK API")
+def health_check(response: Response):
+    response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+    return {"status": True}
 
 
 if __name__ == "__main__":

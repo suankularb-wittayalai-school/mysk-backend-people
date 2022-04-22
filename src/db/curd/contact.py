@@ -81,7 +81,7 @@ def create_contact(contact: QueryContact) -> Contact:
     return get_contact_by_id(contact)
 
 
-def update_contact(contact_id: int, contact: QueryContact) -> Contact:
+def update_contact(contact: Contact) -> Contact:
     """
     Update contact
     :param contact:
@@ -97,9 +97,16 @@ def update_contact(contact_id: int, contact: QueryContact) -> Contact:
     if contact_type_id is None:
         raise Exception(f"Contact type {contact.type} not found")
 
+    contact_id = conn.execute(
+        select([contact_table.c.id]).where(contact_table.c.id == contact.id)
+    ).fetchone()[0]
+
+    if contact_id is None:
+        raise Exception(f"Contact id {contact.id} not found")
+
     conn.execute(
         contact_table.update()
-        .where(contact_table.c.id == contact_id)
+        .where(contact_table.c.id == contact.id)
         .values(
             type=contact_type_id,
             value=contact.value,
@@ -108,7 +115,7 @@ def update_contact(contact_id: int, contact: QueryContact) -> Contact:
     )
     conn.close()
 
-    return get_contact_by_id(contact_id)
+    return get_contact_by_id(contact.id)
 
 
 def delete_contact(contact_id: int) -> Contact:

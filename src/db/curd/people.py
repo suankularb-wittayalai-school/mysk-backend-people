@@ -7,7 +7,7 @@ from ..database import (
     person_contact_table,
 )
 from mysk_utils.schema import Person, Contact, QueryPerson
-from .contact import get_contacts_by_id, create_contact
+from .contact import get_contacts_by_id, create_contact, update_contact
 
 
 def get_person_contact(person_id: int) -> List[Contact]:
@@ -40,27 +40,6 @@ def get_person(person_id: int) -> Person:
 
     person = Person(**dict(result))
 
-    # contacts = conn.execute(
-    #     select([contact_table, person_contact_table, contact_type_table])
-    #     .join(contact_table, person_contact_table.c.contact_id == contact_table.c.id)
-    #     .join(contact_type_table, contact_type_table.c.id == contact_table.c.type)
-    #     .where(person_contact_table.c.person_id == person_id)
-    #     .order_by(contact_table.c.id)
-    # ).fetchall()
-
-    # formatted_contact = [
-    #     Contact(
-    #         **{
-    #             "id": contact.id,
-    #             "type": contact["name_1"],
-    #             "value": contact.value,
-    #             "name": contact.name,
-    #         }
-    #     )
-    #     for contact in contacts
-    # ]
-
-    # same as above
     person.contact = get_person_contact(person_id)
 
     conn.close()
@@ -77,28 +56,6 @@ def get_all_people() -> List[Person]:
     people = [Person(**dict(person)) for person in result]
 
     for person in people:
-        # contacts = conn.execute(
-        #     select([contact_table, person_contact_table, contact_type_table])
-        #     .join(
-        #         contact_table, person_contact_table.c.contact_id == contact_table.c.id
-        #     )
-        #     .join(contact_type_table, contact_type_table.c.id == contact_table.c.type)
-        #     .where(person_contact_table.c.person_id == person.id)
-        #     .order_by(contact_table.c.id)
-        # ).fetchall()
-
-        # formatted_contact = [
-        #     Contact(
-        #         **{
-        #             "id": contact.id,
-        #             "type": contact["name_1"],
-        #             "value": contact.value,
-        #             "name": contact.name,
-        #         }
-        #     )
-        #     for contact in contacts
-        # ]
-
         person.contact = get_person_contact(person.id)
 
     conn.close()
@@ -139,20 +96,20 @@ def create_person(person: QueryPerson) -> Person:
     return created_person
 
 
-def update_person(person_id: int, person: QueryPerson) -> Person:
+def update_person(person: Person) -> Person:
     """
     Update a person in the database.
     """
     conn = engine.connect()
 
-    updating = get_person(person_id)
+    updating = get_person(person.id)
 
     if updating is None:
-        raise Exception(f"Person with id {person_id} not found")
+        raise Exception(f"Person with id {person.id} not found")
 
     conn.execute(
         people_table.update()
-        .where(people_table.c.id == person_id)
+        .where(people_table.c.id == person.id)
         .values(
             prefix_th=person.prefix_th.value,
             first_name_th=person.first_name_th,
@@ -167,8 +124,12 @@ def update_person(person_id: int, person: QueryPerson) -> Person:
         ),
     )
 
+    if person.contact is not None and len(person.contact) > 0:
+        for contact in person.contact:
+            update_contact(contact)
+
     conn.close()
-    updated_person = get_person(person_id)
+    updated_person = get_person(person.id)
     return updated_person
 
 

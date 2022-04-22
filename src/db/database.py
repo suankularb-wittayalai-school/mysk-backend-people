@@ -13,6 +13,7 @@ from sqlalchemy import (
 )
 from dotenv import load_dotenv
 import os
+import sys
 
 # from utils.types.student_teacher.contacts import ContactType
 
@@ -21,9 +22,14 @@ import os
 load_dotenv()
 
 metadata = MetaData()
-engine = create_engine(
-    os.environ.get("DATABASE_URL"), connect_args={"check_same_thread": False}
-)
+DB_URL = os.environ.get("DATABASE_URL")
+
+if hasattr(sys, "_called_from_test"):
+    DB_URL = "sqlite:///./test.db"
+
+
+engine = create_engine(DB_URL, connect_args={"check_same_thread": False})
+
 
 contact_type_table = Table(
     "contact_type",
@@ -65,7 +71,7 @@ people_table = Table(
     Column("middle_name_en", String, nullable=True),
     Column("last_name_en", String),
     Column("birthdate", Date),
-    Column("citizen_id", String),
+    Column("citizen_id", String, unique=True),
 )
 
 student_table = Table(
@@ -73,7 +79,7 @@ student_table = Table(
     metadata,
     Column("id", Integer, primary_key=True),
     Column("person_id", Integer, ForeignKey("people.id")),
-    Column("student_id", String),
+    Column("student_id", String, unique=True),
 )
 
 teacher_table = Table(
