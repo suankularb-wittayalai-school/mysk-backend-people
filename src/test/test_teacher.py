@@ -221,3 +221,28 @@ def test_update_teacher_with_contact():
     assert response.headers["X-Internal-Code"] == str(
         InternalCode.IC_GENERIC_SUCCESS.value
     )
+
+
+def test_update_teacher_not_found():
+    """
+    Test update teacher not found
+    """
+    teacher_json = {
+        "id": 99,
+        "prefix_en": "Mr.",
+        "prefix_th": "นาย",
+        "first_name_en": "Joe",
+        "first_name_th": "จอห์น",
+        "last_name_en": "Doe",
+        "last_name_th": "ดอนดา",
+        "birthdate": "2000-01-01",
+        "citizen_id": "1234567890120",
+        "teacher_id": "skt889",
+    }
+
+    response = client.put("/teacher/", json=teacher_json)
+    assert response.status_code == 400
+    assert response.json()["detail"] is not None
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_BAD_REQUEST.value
+    )
