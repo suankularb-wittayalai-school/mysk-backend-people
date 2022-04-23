@@ -87,7 +87,7 @@ teacher_table = Table(
     metadata,
     Column("id", Integer, primary_key=True),
     Column("person_id", Integer, ForeignKey("people.id")),
-    Column("teacher_id", String),
+    Column("teacher_id", String, unique=True),
 )
 
 metadata.create_all(engine)
