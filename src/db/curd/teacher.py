@@ -23,8 +23,8 @@ def get_teacher_by_id(id: int) -> Teacher:
 
     if query is None:
         return None
-    # print(dict(query))
-    teacher = Teacher(**dict(query), teacher_id=query["teacher_id"])
+    print(dict(query))
+    teacher = Teacher(**dict(query))
     teacher.contact = get_person_contact(query["person_id"])
     conn.close()
     return teacher
@@ -35,18 +35,20 @@ def get_teachers() -> List[Teacher]:
     Get teachers
     """
     conn = engine.connect()
-    query = conn.execute(
+    queries = conn.execute(
         select([teacher_table, people_table])
-        .where(teacher_table.c.id == id)
+        .where(teacher_table.c.id == people_table.c.id)
         .join(people_table, teacher_table.c.person_id == people_table.c.id)
     ).fetchall()
 
-    if query is None:
+    if queries is None:
         return None
     # print(dict(query))
-    teachers = [
-        Teacher(**dict(query), teacher_id=query["teacher_id"]) for query in query
-    ]
+    teachers = []
+    for query in queries:
+        teacher = Teacher(**dict(query))
+        teacher.contact = get_person_contact(query["person_id"])
+        teachers.append(teacher)
     conn.close()
     return teachers
 
