@@ -174,3 +174,50 @@ def test_update_teacher():
         citizen_id="1234567890129",
         teacher_id="skt888",
     )
+
+
+def test_update_teacher_with_contact():
+    """
+    Test update teacher with contact
+    """
+    teacher_json = {
+        "id": 2,
+        "prefix_en": "Mr.",
+        "prefix_th": "นาย",
+        "first_name_en": "Joe",
+        "first_name_th": "จอห์น",
+        "last_name_en": "Doe",
+        "last_name_th": "ดอนดา",
+        "birthdate": "2000-01-01",
+        "citizen_id": "1234567890120",
+        "teacher_id": "skt889",
+        "contact": [
+            {
+                "id": 5,
+                "type": "Email",
+                "value": "john@example.com",
+                "name": "John",
+            }
+        ],
+    }
+
+    expected = Teacher(
+        id=2,
+        prefix_en="Mr.",
+        prefix_th="นาย",
+        first_name_en="Joe",
+        first_name_th="จอห์น",
+        last_name_en="Doe",
+        last_name_th="ดอนดา",
+        birthdate="2000-01-01",
+        citizen_id="1234567890120",
+        teacher_id="skt889",
+        contact=[Contact(id=5, type="Email", value="john@example.com", name="John")],
+    )
+
+    response = client.put("/teacher/", json=teacher_json)
+    assert response.status_code == 200
+    assert Teacher(**response.json()) == expected
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_SUCCESS.value
+    )
