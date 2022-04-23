@@ -3,7 +3,7 @@ from db.curd.teacher import (
     get_teacher_by_id,
     get_teachers,
     create_teacher,
-    update_person,
+    update_teacher,
 )
 
 # internal modules
@@ -75,7 +75,7 @@ def update_teacher_view(teacher: Teacher, response: Response):
     Update teacher
     """
     try:
-        teacher = update_person(teacher)
+        teacher = update_teacher(teacher)
         if teacher is None:
             raise HTTPException(
                 status_code=400,

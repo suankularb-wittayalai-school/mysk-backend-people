@@ -23,7 +23,7 @@ def get_teacher_by_id(id: int) -> Teacher:
 
     if query is None:
         return None
-    print(dict(query))
+    # print(dict(query))
     teacher = Teacher(**dict(query))
     teacher.contact = get_person_contact(query["person_id"])
     conn.close()
@@ -36,15 +36,13 @@ def get_teachers() -> List[Teacher]:
     """
     conn = engine.connect()
     queries = conn.execute(
-        select([teacher_table, people_table])
-        .where(teacher_table.c.id == people_table.c.id)
-        .join(people_table, teacher_table.c.person_id == people_table.c.id)
+        select([teacher_table, people_table]).join(
+            people_table, teacher_table.c.person_id == people_table.c.id
+        )
     ).fetchall()
-
-    if queries is None:
-        return None
     # print(dict(query))
     teachers = []
+    print(queries)
     for query in queries:
         teacher = Teacher(**dict(query))
         teacher.contact = get_person_contact(query["person_id"])
@@ -90,13 +88,12 @@ def update_teacher(teacher: Teacher) -> Teacher:
     """
     conn = engine.connect()
 
-    try:
-        person_id = conn.execute(
-            select([teacher_table.c.person_id]).where(teacher_table.c.id == teacher.id)
-        ).fetchone()[0]
-    except IndexError:
-        return None
-
+    person_id = conn.execute(
+        select([people_table])
+        .where(people_table.c.citizen_id == teacher.citizen_id)
+        .limit(1)
+    ).fetchone()["id"]
+    # print(person_id)
     person = Person(
         id=person_id,
         prefix_th=teacher.prefix_th.value,
