@@ -1,8 +1,8 @@
 # local module
-from db.curd.teacher import get_teacher_by_id, get_teachers
+from db.curd.teacher import get_teacher_by_id, get_teachers, create_teacher
 
 # internal modules
-from mysk_utils.schema import Teacher
+from mysk_utils.schema import Teacher, QueryTeacher
 from mysk_utils.response import InternalCode
 
 # external modules
@@ -45,3 +45,20 @@ def get_teachers_view(response: Response):
 
     response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
     return teachers
+
+
+@router.post("/", response_model=Teacher)
+def create_teacher_view(teacher: QueryTeacher, response: Response):
+    """
+    Create teacher
+    """
+    teacher = create_teacher(teacher)
+    if teacher is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Teacher not created",
+            headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
+        )
+
+    response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+    return teacher
