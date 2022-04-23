@@ -1,9 +1,9 @@
 # local modules
 from ..database import engine, teacher_table, people_table
-from db.curd.people import get_person_contact, create_person
+from db.curd.people import get_person_contact, create_person, update_person
 
 # internal modules
-from mysk_utils.schema import Teacher, QueryTeacher, QueryPerson
+from mysk_utils.schema import Teacher, QueryTeacher, QueryPerson, Person
 
 # external modules
 from sqlalchemy import select
@@ -82,3 +82,42 @@ def create_teacher(teacher: QueryTeacher) -> Teacher:
     ).inserted_primary_key[0]
     conn.close()
     return get_teacher_by_id(teacher_id)
+
+
+def update_teacher(teacher: Teacher) -> Teacher:
+    """
+    Update teacher
+    """
+    conn = engine.connect()
+
+    try:
+        person_id = conn.execute(
+            select([teacher_table.c.person_id]).where(teacher_table.c.id == teacher.id)
+        ).fetchone()[0]
+    except IndexError:
+        return None
+
+    person = Person(
+        id=person_id,
+        prefix_th=teacher.prefix_th.value,
+        prefix_en=teacher.prefix_en.value,
+        first_name_th=teacher.first_name_th,
+        first_name_en=teacher.first_name_en,
+        last_name_th=teacher.last_name_th,
+        last_name_en=teacher.last_name_en,
+        middle_name_th=teacher.middle_name_th,
+        middle_name_en=teacher.middle_name_en,
+        contact=teacher.contact,
+        birthdate=teacher.birthdate,
+        citizen_id=teacher.citizen_id,
+    )
+
+    update_person(person)
+
+    conn.execute(
+        teacher_table.update()
+        .where(teacher_table.c.id == teacher.id)
+        .values(person_id=person_id, teacher_id=teacher.teacher_id)
+    )
+    conn.close()
+    return get_teacher_by_id(teacher.id)

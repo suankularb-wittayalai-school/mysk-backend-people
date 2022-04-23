@@ -1,5 +1,10 @@
 # local module
-from db.curd.teacher import get_teacher_by_id, get_teachers, create_teacher
+from db.curd.teacher import (
+    get_teacher_by_id,
+    get_teachers,
+    create_teacher,
+    update_person,
+)
 
 # internal modules
 from mysk_utils.schema import Teacher, QueryTeacher
@@ -62,3 +67,28 @@ def create_teacher_view(teacher: QueryTeacher, response: Response):
 
     response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
     return teacher
+
+
+@router.put("/", response_model=Teacher)
+def update_teacher_view(teacher: Teacher, response: Response):
+    """
+    Update teacher
+    """
+    try:
+        teacher = update_person(teacher)
+        if teacher is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Teacher not updated",
+                headers={
+                    "X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)
+                },
+            )
+        response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+        return teacher
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+            headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
+        )
