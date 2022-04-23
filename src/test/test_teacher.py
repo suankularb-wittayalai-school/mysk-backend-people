@@ -246,3 +246,34 @@ def test_update_teacher_not_found():
     assert response.headers["X-Internal-Code"] == str(
         InternalCode.IC_GENERIC_BAD_REQUEST.value
     )
+
+
+def test_delete_teacher():
+    """
+    Test delete teacher
+    """
+    response = client.delete("/teacher/1")
+    assert response.status_code == 200
+    assert response.json()["id"] == "1"
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_SUCCESS.value
+    )
+
+    response = client.get("/teacher/1")
+    assert response.status_code == 400
+    assert response.json()["detail"] is not None
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_BAD_REQUEST.value
+    )
+
+
+def test_delete_teacher_not_found():
+    """
+    Test delete teacher not found
+    """
+    response = client.delete("/teacher/99")
+    assert response.status_code == 400
+    assert response.json()["detail"] is not None
+    assert response.headers["X-Internal-Code"] == str(
+        InternalCode.IC_GENERIC_BAD_REQUEST.value
+    )

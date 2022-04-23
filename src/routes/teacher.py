@@ -4,6 +4,7 @@ from db.curd.teacher import (
     get_teachers,
     create_teacher,
     update_teacher,
+    delete_teacher,
 )
 
 # internal modules
@@ -80,6 +81,31 @@ def update_teacher_view(teacher: Teacher, response: Response):
             raise HTTPException(
                 status_code=400,
                 detail="Teacher not updated",
+                headers={
+                    "X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)
+                },
+            )
+        response.headers["X-Internal-Code"] = str(InternalCode.IC_GENERIC_SUCCESS.value)
+        return teacher
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+            headers={"X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)},
+        )
+
+
+@router.delete("/{teacher_id}", response_model=Teacher)
+def delete_teacher_view(teacher_id: int, response: Response):
+    """
+    Delete teacher
+    """
+    try:
+        teacher = delete_teacher(teacher_id)
+        if teacher is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Teacher not deleted",
                 headers={
                     "X-Internal-Code": str(InternalCode.IC_GENERIC_BAD_REQUEST.value)
                 },

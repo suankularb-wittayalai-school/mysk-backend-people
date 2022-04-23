@@ -118,3 +118,16 @@ def update_teacher(teacher: Teacher) -> Teacher:
     )
     conn.close()
     return get_teacher_by_id(teacher.id)
+
+
+def delete_teacher(id: int) -> Teacher:
+    """
+    Delete teacher
+    """
+    conn = engine.connect()
+    deleting = get_teacher_by_id(id)
+    if deleting is None:
+        return None
+    conn.execute(teacher_table.delete().where(teacher_table.c.id == id))
+    conn.close()
+    return deleting

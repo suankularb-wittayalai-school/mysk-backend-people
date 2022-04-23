@@ -78,7 +78,7 @@ student_table = Table(
     "student",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("person_id", Integer, ForeignKey("people.id")),
+    Column("person_id", Integer, ForeignKey("people.id", ondelete="CASCADE")),
     Column("student_id", String, unique=True),
 )
 
@@ -86,7 +86,7 @@ teacher_table = Table(
     "teacher",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("person_id", Integer, ForeignKey("people.id")),
+    Column("person_id", Integer, ForeignKey("people.id", ondelete="CASCADE")),
     Column("teacher_id", String, unique=True),
 )
 
