@@ -16,7 +16,7 @@ importlib-metadata==4.2.0
 iniconfig==1.1.1
 mccabe==0.6.1
 mypy-extensions==0.4.3
-mysk-utils @ git+https://github.com/suankularb-wittayalai-school/mysk-utils.git@caedadd25fb063ba46587c1510cceed8f144f74c
+mysk-utils @ git+https://github.com/suankularb-wittayalai-school/mysk-utils.git@main
 packaging==21.3
 pathspec==0.9.0
 platformdirs==2.5.1

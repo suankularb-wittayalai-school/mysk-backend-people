@@ -7,7 +7,7 @@ import os
 
 from mysk_utils.response import InternalCode
 
-from routes import people, contacts, student
+from routes import people, contacts, student, teacher
 
 load_dotenv()
 
@@ -16,6 +16,7 @@ app = FastAPI()
 app.include_router(people.router, prefix="/people", tags=["people"])
 app.include_router(contacts.router, prefix="/contacts", tags=["contacts"])
 app.include_router(student.router, prefix="/student", tags=["student"])
+app.include_router(teacher.router, prefix="/teacher", tags=["teacher"])
 
 
 @app.get("/", status_code=200, response_description="Welcome to MySK API")
